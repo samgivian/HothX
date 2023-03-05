@@ -67,7 +67,7 @@ function LandingScreen({ navigation }) {
         // Signed in
         const user = userCredential.user;
         //alert("signed in");
-        navigation.navigate("Details");
+        navigation.navigate("Home");
       })
       .catch((error) => {
         const errorCode = error.code;
@@ -80,6 +80,7 @@ function LandingScreen({ navigation }) {
       .then((userCredential) => {
         const user = userCredential.user;
         alert("Succesfuly Signed up!");
+        navigation.navigate("Home");
       })
       .catch((error) => {
         const errorCode = error.code;
@@ -141,6 +142,7 @@ function LandingScreen({ navigation }) {
           placeholderTextColor="white"
           autoCapitalize="none"
           onChangeText={onChangePassword}
+          secureTextEntry={true}
         />
         <Text
           style={{

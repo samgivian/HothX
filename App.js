@@ -4,15 +4,8 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import LandingScreen from "./pages/LandingScreen/LandingScreen";
+import HomeScreen from "./pages/HomeScreen/HomeScreen";
 const Stack = createNativeStackNavigator();
-
-function DetailsScreen() {
-  return (
-    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-      <Text>Details Screen</Text>
-    </View>
-  );
-}
 
 function App() {
   return (
@@ -23,7 +16,7 @@ function App() {
         }}
       >
         <Stack.Screen name="Landing" component={LandingScreen} />
-        <Stack.Screen name="Details" component={DetailsScreen} />
+        <Stack.Screen name="Home" component={HomeScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
