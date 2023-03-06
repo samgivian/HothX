@@ -1,19 +1,22 @@
-import React, { useState, useEffect } from "react";
 import {
-  Button,
-  Image,
   View,
-  Platform,
-  TouchableOpacity,
   Text,
-  ActivityIndicator,
+  StyleSheet,
+  TouchableOpacity,
+  SafeAreaView,
+  Alert,
+  Image,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import styles from "./style";
-import { getStorage, ref, storage } from "firebase/storage";
+import React, { useState } from "react";
+
 import { initializeApp } from "firebase/app";
+import { firebase } from "../../firebaseConfig";
+import { getDatabase, set, ref } from "firebase/database";
 
 export default function HomeScreen() {
+  // TODO: Replace the following with your app's Firebase project configuration
+  // See: https://firebase.google.com/docs/web/learn-more#config-object
   const firebaseConfig = {
     apiKey: "AIzaSyDKaiK2UWx9kXFVTt0LShsIL0DObleIzcw",
     authDomain: "hackhill-b5c62.firebaseapp.com",
@@ -28,10 +31,21 @@ export default function HomeScreen() {
   // Initialize Firebase
   const app = initializeApp(firebaseConfig);
 
-  const [image, setImage] = useState(null);
-  const storage = getStorage();
+  // Initialize Realtime Database and get a reference to the service
+  const database = getDatabase(app);
 
+  const [image, setImage] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const [output, setOutput] = useState("");
+
+  submitDataBase = () => {
+    alert("Submit to database");
+    set(ref(database, "users/"), {
+      username: "asdasdasdasd",
+      email: "asdasdas",
+    });
+  };
+
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -41,40 +55,98 @@ export default function HomeScreen() {
       quality: 1,
     });
 
-    console.log(result);
+    const source = { uri: result.uri };
+    console.log(source);
+    setImage(source);
+  };
 
-    if (!result.canceled) {
-      setImage(result.assets[0].uri);
+  const uploadImage = async () => {
+    setUploading(true);
+    const response = await fetch(image.uri);
+    const blob = await response.blob();
+    const filename = image.uri.substring(image.uri.lastIndexOf("/") + 1);
+    var refImage = firebase.storage().ref().child(filename).put(blob);
+
+    try {
+      urlImage = await refImage;
+
+      outputURL =
+        "https://firebasestorage.googleapis.com/v0/b/hackhill-b5c62.appspot.com/o/" +
+        urlImage.metadata.fullPath.toString() +
+        "?alt=media&token";
+      alert(outputURL);
+      set(ref(database, "imageURL"), {
+        URL: outputURL,
+      });
+    } catch (e) {
+      console.error(e);
     }
+
+    setUploading(false);
+    /*
+    set(ref(database, "imageURL/"), {
+      URL: urlSubmit,
+    });
+    */
+    Alert.alert("Photo uploaded!!!");
+
+    setImage(null);
   };
 
   return (
-    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-      <Button title="Pick an image from camera roll" onPress={pickImage} />
-      {image && (
-        <Image
-          source={{ uri: image }}
-          style={{ width: 200, height: 200 }}
-          onPress={() => alert(image)}
-        />
-      )}
-      <Button title="Upload Image" />
-
-      <TouchableOpacity
-        //={styles.submitButton}
-        title="Go to Details"
-        onPress={() => {
-          //  const mountainsRef = ref(storage, 'mountains.jpg');
-          alert(image.uri);
-          const task = storage().ref(filename).putFile(uploadUri);
-          // this.submitDataBase();
-          //navigation.navigate("Details")
-        }}
-      >
-        <Text style={{ color: "black", fontWeight: "bold" }}> Submit </Text>
+    <SafeAreaView style={styles.container}>
+      <TouchableOpacity style={styles.selectButton} onPress={pickImage}>
+        <Text style={styles.buttonText}>Pick an image</Text>
       </TouchableOpacity>
+      <View style={styles.imageContainer}>
+        {image && (
+          <Image
+            source={{ uri: image.uri }}
+            style={{ width: 300, height: 300 }}
+          />
+        )}
 
-      <Text>Result</Text>
-    </View>
+        <TouchableOpacity style={styles.uploadButton} onPress={uploadImage}>
+          <Text style={styles.buttonText}>Upload image</Text>
+        </TouchableOpacity>
+      </View>
+      <Text>Result:{output}</Text>
+    </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: "center",
+    backgroundColor: "#ffffff",
+    justifyContent: "center",
+  },
+  selectButton: {
+    borderRadius: 5,
+    width: 150,
+    height: 50,
+    backgroundColor: "blue",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  uploadButton: {
+    borderRadius: 5,
+    width: 150,
+    height: 50,
+    backgroundColor: "#507dbc",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 20,
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  imageContainer: {
+    marginTop: 30,
+    marginBottom: 50,
+    alignItems: "center",
+  },
+});

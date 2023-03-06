@@ -1,25 +1,27 @@
-import { initializeApp } from "firebase/app";
 
-// Optionally import the services that you want to use
-// import {...} from "firebase/auth";
-// import {...} from "firebase/database";
-// import {...} from "firebase/firestore";
-// import {...} from "firebase/functions";
-// import {...} from "firebase/storage";
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/auth';
+import 'firebase/compat/firestore';
+import 'firebase/compat/storage'
 
-// Initialize Firebase
 const firebaseConfig = {
-  apiKey: "AIzaSyDKaiK2UWx9kXFVTt0LShsIL0DObleIzcw",
-  authDomain: "hackhill-b5c62.firebaseapp.com",
-  databaseURL: "https://hackhill-b5c62-default-rtdb.firebaseio.com",
-  projectId: "hackhill-b5c62",
-  storageBucket: "hackhill-b5c62.appspot.com",
-  messagingSenderId: "1011777628241",
-  appId: "1:1011777628241:web:0107c13c2be3fe57be3070",
-  measurementId: "G-44KH16YWY2",
-};
+    apiKey: "AIzaSyDKaiK2UWx9kXFVTt0LShsIL0DObleIzcw",
+    authDomain: "hackhill-b5c62.firebaseapp.com",
+    databaseURL: "https://hackhill-b5c62-default-rtdb.firebaseio.com",
+    projectId: "hackhill-b5c62",
+    storageBucket: "hackhill-b5c62.appspot.com",
+    messagingSenderId: "1011777628241",
+    appId: "1:1011777628241:web:0107c13c2be3fe57be3070",
+    measurementId: "G-44KH16YWY2"
+  };
 
-const app = initializeApp(firebaseConfig);
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
+
+export { firebase };
+
+
 
 // For more information on how to access Firebase in your project,
 // see the Firebase documentation: https://firebase.google.com/docs/web/setup#access-firebase

@@ -2,7 +2,7 @@ import { StyleSheet } from "react-native";
 
 export default StyleSheet.create({
   submitButton: {
-    backgroundColor: "#a1c6ea",
+    backgroundColor: "#507dbc",
     borderColor: "white",
     color: "white",
     width: "80%",
