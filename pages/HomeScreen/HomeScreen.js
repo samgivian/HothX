@@ -12,7 +12,7 @@ import React, { useState } from "react";
 
 import { initializeApp } from "firebase/app";
 import { firebase } from "../../firebaseConfig";
-import { getDatabase, set, ref } from "firebase/database";
+import { getDatabase, set, ref, onValue } from "firebase/database";
 
 export default function HomeScreen() {
   // TODO: Replace the following with your app's Firebase project configuration
@@ -36,7 +36,8 @@ export default function HomeScreen() {
 
   const [image, setImage] = useState(null);
   const [uploading, setUploading] = useState(false);
-  const [output, setOutput] = useState("");
+  const [answer, setAnswer] = useState("");
+  const [result_str, setResult_str] = useState("");
 
   submitDataBase = () => {
     alert("Submit to database");
@@ -60,6 +61,30 @@ export default function HomeScreen() {
     setImage(source);
   };
 
+  readOutput = () => {
+    this.interval = setInterval(() => {
+      const answerRef = ref(database, "results/answer");
+      const resultRef = ref(database, "results/result_str");
+      onValue(answerRef, (snapshot) => {
+        const data = snapshot.val();
+        if (data != "") {
+          setAnswer(data);
+        }
+      });
+      onValue(resultRef, (snapshot) => {
+        const data = snapshot.val();
+        if (data != "") {
+          setResult_str(data);
+          set(ref(database, "results/"), {
+            answer: "",
+            result_str: "",
+          });
+        }
+        //alert(data);
+      });
+    }, 1000);
+  };
+
   const uploadImage = async () => {
     setUploading(true);
     const response = await fetch(image.uri);
@@ -74,10 +99,11 @@ export default function HomeScreen() {
         "https://firebasestorage.googleapis.com/v0/b/hackhill-b5c62.appspot.com/o/" +
         urlImage.metadata.fullPath.toString() +
         "?alt=media&token";
-      alert(outputURL);
+      //alert(outputURL);
       set(ref(database, "imageURL"), {
         URL: outputURL,
       });
+      this.readOutput();
     } catch (e) {
       console.error(e);
     }
@@ -110,7 +136,8 @@ export default function HomeScreen() {
           <Text style={styles.buttonText}>Upload image</Text>
         </TouchableOpacity>
       </View>
-      <Text>Result:{output}</Text>
+      <Text>Answer:{answer}</Text>
+      <Text>Result:{result_str}</Text>
     </SafeAreaView>
   );
 }
